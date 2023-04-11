@@ -12,3 +12,7 @@ archive
 .mypy_cache
 __pycache__
 _build
+
+build
+install
+log
