@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QTransform, QKeySequence
 from PyQt5.QtCore import QSize, Qt, QEvent, QThread
 import sys
 import pathlib
+import logging
 
 import rclpy
 
@@ -16,12 +17,17 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Demobot Console")
         self.resize(800, 500)
+        
+        # You can control the logging level
+        logging.getLogger().setLevel(logging.DEBUG)
+        print("file path:", pathlib.Path().absolute())
 
         self.lateral_speed = 0.5
         self.angular_speed = 0.6
         self.count = 1
 
         self.node = node
+        self.node.printSignal.connect(self.printSlot)
         self.init_layouts()
         self.init_widgets()
         self.init_connection()
@@ -35,6 +41,9 @@ class MainWindow(QMainWindow):
         self.thread.stop()
         self.thread.wait()
         event.accept()
+
+    def printSlot(self, string):
+        logging.info(string)
 
     def init_layouts(self):
         main_widget = QWidget(self)
@@ -79,7 +88,7 @@ class MainWindow(QMainWindow):
         self.forward_button.setAutoRepeat(False)
         self.forward_button.setFixedSize(110,80)
         # self.forward_button.setShortcut("W")
-        forward_icon = QPixmap("robomaster_console/resource/up-arrow.png")
+        forward_icon = QPixmap("robomaster_ros/robomaster_console/resource/up-arrow.png")
         self.forward_button.setIcon(QIcon(forward_icon))
         self.forward_button.setIconSize(QSize(80,80))
         self.forward_button.setFlat(True)
@@ -89,7 +98,7 @@ class MainWindow(QMainWindow):
         self.backward_button = QPushButton(self)
         self.backward_button.setAutoRepeat(False)
         self.backward_button.setFixedSize(110,80)
-        backward_icon = QPixmap("robomaster_console/resource/up-arrow.png")
+        backward_icon = QPixmap("robomaster_ros/robomaster_console/resource/up-arrow.png")
         backward_icon = backward_icon.transformed(QTransform().rotate(180), Qt.SmoothTransformation)
         self.backward_button.setIcon(QIcon(backward_icon))
         self.backward_button.setIconSize(QSize(80,80))
@@ -101,7 +110,7 @@ class MainWindow(QMainWindow):
         self.left_button.setAutoRepeat(False)
         self.left_button.setFixedSize(80,80)
         # self.left_button.setShortcut("A")
-        left_icon = QPixmap("robomaster_console/resource/up-arrow.png")
+        left_icon = QPixmap("robomaster_ros/robomaster_console/resource/up-arrow.png")
         left_icon = left_icon.transformed(QTransform().rotate(270), Qt.SmoothTransformation)
         self.left_button.setIcon(QIcon(left_icon))
         self.left_button.setIconSize(QSize(80,80))
@@ -112,7 +121,7 @@ class MainWindow(QMainWindow):
         self.right_button = QPushButton(self)
         self.right_button.setAutoRepeat(False)
         self.right_button.setFixedSize(80,80)
-        right_icon = QPixmap("robomaster_console/resource/up-arrow.png")
+        right_icon = QPixmap("robomaster_ros/robomaster_console/resource/up-arrow.png")
         right_icon = right_icon.transformed(QTransform().rotate(90), Qt.SmoothTransformation)
         self.right_button.setIcon(QIcon(right_icon))
         self.right_button.setIconSize(QSize(80,80))
@@ -124,7 +133,7 @@ class MainWindow(QMainWindow):
         self.up_button = QPushButton(self)
         self.up_button.setAutoRepeat(False)
         self.up_button.setFixedSize(105,80)
-        up_icon = QPixmap("robomaster_console/resource/up-arrow.png")
+        up_icon = QPixmap("robomaster_ros/robomaster_console/resource/up-arrow.png")
         self.up_button.setIcon(QIcon(up_icon))
         self.up_button.setIconSize(QSize(80,80))
         self.up_button.setFlat(True)
@@ -134,7 +143,7 @@ class MainWindow(QMainWindow):
         self.down_button = QPushButton(self)
         self.down_button.setAutoRepeat(False)
         self.down_button.setFixedSize(105,80)
-        down_icon = QPixmap("robomaster_console/resource/up-arrow.png")
+        down_icon = QPixmap("robomaster_ros/robomaster_console/resource/up-arrow.png")
         down_icon = down_icon.transformed(QTransform().rotate(180), Qt.SmoothTransformation)
         self.down_button.setIcon(QIcon(down_icon))
         self.down_button.setIconSize(QSize(80,80))
@@ -145,7 +154,7 @@ class MainWindow(QMainWindow):
         self.in_button = QPushButton(self)
         self.in_button.setAutoRepeat(False)
         self.in_button.setFixedSize(50,50)
-        in_icon = QPixmap("robomaster_console/resource/up-arrow.png")
+        in_icon = QPixmap("robomaster_ros/robomaster_console/resource/up-arrow.png")
         in_icon = in_icon.transformed(QTransform().rotate(270), Qt.SmoothTransformation)
         self.in_button.setIcon(QIcon(in_icon))
         self.in_button.setIconSize(QSize(50,50))
@@ -156,7 +165,7 @@ class MainWindow(QMainWindow):
         self.out_button = QPushButton(self)
         self.out_button.setAutoRepeat(False)
         self.out_button.setFixedSize(50,50)
-        out_icon = QPixmap("robomaster_console/resource/up-arrow.png")
+        out_icon = QPixmap("robomaster_ros/robomaster_console/resource/up-arrow.png")
         out_icon = out_icon.transformed(QTransform().rotate(90), Qt.SmoothTransformation)
         self.out_button.setIcon(QIcon(out_icon))
         self.out_button.setIconSize(QSize(50,50))
@@ -168,7 +177,7 @@ class MainWindow(QMainWindow):
         self.hold_button = QPushButton(self)
         self.hold_button.setAutoRepeat(False)
         self.hold_button.setFixedSize(50,50)
-        hold_icon = QPixmap("robomaster_console/resource/unfold-less.png")
+        hold_icon = QPixmap("robomaster_ros/robomaster_console/resource/unfold-less.png")
         hold_icon = hold_icon.transformed(QTransform().rotate(90), Qt.SmoothTransformation)
         self.hold_button.setIcon(QIcon(hold_icon))
         self.hold_button.setIconSize(QSize(50,50))
@@ -179,7 +188,7 @@ class MainWindow(QMainWindow):
         self.release_button = QPushButton(self)
         self.release_button.setAutoRepeat(False)
         self.release_button.setFixedSize(50,50)
-        release_icon = QPixmap("robomaster_console/resource/unfold-more.png")
+        release_icon = QPixmap("robomaster_ros/robomaster_console/resource/unfold-more.png")
         release_icon = release_icon.transformed(QTransform().rotate(90), Qt.SmoothTransformation)
         self.release_button.setIcon(QIcon(release_icon))
         self.release_button.setIconSize(QSize(50,50))
@@ -198,7 +207,7 @@ class MainWindow(QMainWindow):
         # set stop button
         self.stop_button = QPushButton(self)
         self.stop_button.setShortcut("Ctrl+B")
-        self.stop_button.setIcon(QIcon("robomaster_console/resource/stop.png"))
+        self.stop_button.setIcon(QIcon("robomaster_ros/robomaster_console/resource/stop.png"))
         self.stop_button.setIconSize(QSize(200,200))
         self.stop_button.setFlat(True)
 

@@ -10,7 +10,9 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
 from typing import Any, Optional
+import logging
 
+import sensor_msgs.msg
 import geometry_msgs.msg
 import robomaster_msgs.msg
 from robomaster_msgs.action import GripperControl
@@ -24,6 +26,7 @@ class GripperState(enum.Enum):
     CLOSE = 2
 
 class ConsoleNode(Node, QObject):
+    printSignal = pyqtSignal(str)
     def __init__(self, executor: rclpy.executors.Executor):
         Node.__init__(self, 'console_node')
         QObject.__init__(self)
@@ -34,6 +37,11 @@ class ConsoleNode(Node, QObject):
             history=QoSHistoryPolicy.KEEP_LAST,
             durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
             reliability=QoSReliabilityPolicy.RELIABLE,
+            depth=1)
+        input_qos = QoSProfile(
+            history=QoSHistoryPolicy.KEEP_LAST,
+            durability=QoSDurabilityPolicy.VOLATILE,
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,
             depth=1)
 
         self.move_cmd = geometry_msgs.msg.Twist()
@@ -49,6 +57,8 @@ class ConsoleNode(Node, QObject):
 
         self._arm_sub = self.create_subscription(geometry_msgs.msg.PointStamped, '/arm_position', 
                                                  self.update_arm_status, 1)
+        self._lidar_sub = self.create_subscription(sensor_msgs.msg.LaserScan, '/scan', 
+                                                 self.update_laser_scan, input_qos)
         
         # reset arm
         self.arm_max_x = 0.187
@@ -59,7 +69,6 @@ class ConsoleNode(Node, QObject):
         self.arm_cmd.x = self.arm_min_x
         self.arm_cmd.z = self.arm_min_z
         self._arm_pub.publish(self.arm_cmd)
-
 
     def drive(self, linear_speed):
         self.move_cmd.linear.x = linear_speed
@@ -99,31 +108,24 @@ class ConsoleNode(Node, QObject):
         goal_msg.target_state = 2
         goal_msg.power = 0.5
         # self._gripper_client.wait_for_server()
-        self._gripper_client.send_goal_async(goal_msg)
+        # self._gripper_client.send_goal_async(goal_msg)
+        self._gripper_client.send_goal(goal_msg)
 
 
     def loose_gripper(self):
         goal_msg = GripperControl.Goal()
         goal_msg.target_state = 1
-        self._gripper_client.send_goal_async(goal_msg)
+        # self._gripper_client.send_goal_async(goal_msg)
+        self._gripper_client.send_goal(goal_msg)
 
     def stop_gripper(self):
         goal_msg = GripperControl.Goal()
         goal_msg.target_state = 0
-        self._gripper_client.send_goal_async(goal_msg)
-
-
-    # subscription callbacks
-    def update_battery_status(self, status):
-        percentage = status.percentage * 100
-        print("percentage", percentage)
-        self.logger.info(f"battery status: {percentage:.2f} %")
-        self.battery_signal.emit(percentage)
-                                
-        # self.publisher_ = self.create_publisher(String, 'topic', 10)
-        # timer_period = 0.5  # seconds
-        # self.timer = self.create_timer(timer_period, self.timer_callback)
-        # self.i = 0
+        # self._gripper_client.send_goal_async(goal_msg)
+        self._gripper_client.send_goal(goal_msg)
 
     def update_arm_status(self, status: geometry_msgs.msg.PointStamped):
         self.arm_status = status
+
+    def update_laser_scan(self, status: sensor_msgs.msg.LaserScan):
+        self.printSignal.emit("scan_time: "+str(status.scan_time))

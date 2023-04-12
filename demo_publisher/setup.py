@@ -1,9 +1,7 @@
 from setuptools import setup
 import glob
-package_name = 'robomaster_console'
 
-# print("resource:")
-# print(glob.glob('resource/*.png'))
+package_name = 'demo_publisher'
 
 setup(
     name=package_name,
@@ -12,12 +10,10 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
-        ('share/' + package_name + '/resource',
-            glob.glob('resource/*.png')),
         ('share/' + package_name + '/launch', glob.glob('launch/*.launch.py')),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools', 'numpy', 'numpy-quaternion', 'pyyaml', 'robomaster'],
+    install_requires=['setuptools'],
     zip_safe=True,
     maintainer='aicore',
     maintainer_email='yangtx2009@hotmail.com',
@@ -26,7 +22,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'robomaster_console = robomaster_console:main',
+            'demo_publisher = demo_publisher:main'
         ],
     },
 )

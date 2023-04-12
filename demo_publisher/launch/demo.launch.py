@@ -21,9 +21,9 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'),
 
         Node(
-            package='robomaster_console',
-            executable='robomaster_console',
-            name='robomaster_console',
+            package='demo_publisher',
+            executable='demo_publisher',
+            name='demo_publisher',
             output='screen',
             parameters=[{'use_sim_time': use_sim_time}],
             arguments=[('__log_level:=debug')]
