@@ -8,12 +8,17 @@ def main(args=None):
     rclpy.init(args=args, signal_handler_options=SignalHandlerOptions.NO)
     executor = rclpy.executors.MultiThreadedExecutor()
 
-    node = DemoPublisher()
-    executor.add_node(node)
+    try:
+        node = DemoPublisher()
+        executor.add_node(node)
 
-    try: 
-        executor.spin()
-    finally:
+        try: 
+            executor.spin()
+        finally:
+            executor.shutdown()
+            node.destroy_node()
+    except KeyboardInterrupt:
+        node.stop()
         executor.shutdown()
         node.destroy_node()
 

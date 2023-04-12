@@ -43,6 +43,9 @@ class DemoPublisher(Node):
         self.timer = RepeatedTimer(1.0, self.publish)
         self.timer.start()
 
+    def stop(self):
+        self.timer.stop()
+
     def publish(self):
         self._message.data = "count:"+str(self.count)
         logging.info(self._message.data)
