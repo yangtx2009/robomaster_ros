@@ -11,6 +11,8 @@ import threading
 import sensor_msgs.msg
 import geometry_msgs.msg
 from std_msgs.msg import String
+import cv2
+from cv_bridge import CvBridge, CvBridgeError
 
 from demo_publisher.repeated_timer import RepeatedTimer
 
@@ -26,6 +28,12 @@ class DemoPublisher(Node):
             depth=5)
         
         self._message = String()
+
+        self.bridge = CvBridge()
+        self.frame = cv2.imread("robomaster_ros/demo_publisher/resource/example.jpg")
+        self._image_pub = self.create_publisher(sensor_msgs.msg.Image, "/image", output_qos)
+
+        self._image = sensor_msgs.msg.Image()
         self._string_pub = self.create_publisher(String, '/demo_string', output_qos)
 
         self.count = 0
@@ -38,3 +46,5 @@ class DemoPublisher(Node):
         print(self._message.data)
         self._string_pub.publish(self._message)
         self.count += 1
+
+        self._image_pub.publish(self.bridge.cv2_to_imgmsg(self.frame, "bgr8"))
