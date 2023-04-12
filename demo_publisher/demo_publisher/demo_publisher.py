@@ -20,7 +20,8 @@ class DemoPublisher(Node):
     def __init__(self):
         Node.__init__(self, 'demo_publisher')
 
-        self.logger = self.get_logger()
+        logging.getLogger().setLevel(logging.DEBUG)
+
         output_qos = QoSProfile(
             history=QoSHistoryPolicy.KEEP_LAST,
             durability=QoSDurabilityPolicy.VOLATILE,
@@ -31,9 +32,11 @@ class DemoPublisher(Node):
 
         self.bridge = CvBridge()
         self.frame = cv2.imread("robomaster_ros/demo_publisher/resource/example.jpg")
+        # cv2.imshow("frame",self.frame)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
         self._image_pub = self.create_publisher(sensor_msgs.msg.Image, "/image", output_qos)
 
-        self._image = sensor_msgs.msg.Image()
         self._string_pub = self.create_publisher(String, '/demo_string', output_qos)
 
         self.count = 0
@@ -42,8 +45,7 @@ class DemoPublisher(Node):
 
     def publish(self):
         self._message.data = "count:"+str(self.count)
-        self.logger.info(self._message.data)
-        print(self._message.data)
+        logging.info(self._message.data)
         self._string_pub.publish(self._message)
         self.count += 1
 
